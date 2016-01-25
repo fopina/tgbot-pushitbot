@@ -1,0 +1,6 @@
+*.pyc
+*.sqlite3
+env/
+/localrun
+.coverage
+/.idea
