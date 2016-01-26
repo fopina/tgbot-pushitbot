@@ -13,7 +13,7 @@ class BotTest(plugintest.PluginTestCase):
         self.webapp = TestApp(pushitbot.extend_webapp(wsgi_app([self.bot]), self.bot))
 
     def test_ping(self):
-            self.assertEqual(self.webapp.get('/ping/').text, '<b>Pong!</b>')
+        self.assertEqual(self.webapp.get('/ping/').text, '<b>Pong!</b>')
 
     def test_chat(self):
         self.receive_message('invalid')
@@ -32,9 +32,12 @@ I'm not really chatty. Give /help a try if you need something.''')
         self.assertReplied('''\
 You can use the following token to access the HTTP API:
 
-*%s*
+*%(token)s*
 
-Please send /help command if you have any problem''' % token)
+Your API URL: https://tgbots-fopina.rhcloud.com/pushit/%(token)s
+Your WebPush URL: http://fopina.github.io/tgbot-pushitbot/webpush/#%(token)s
+
+Please send /help command if you have any problem''' % {'token': token})
 
         return token
 
@@ -49,9 +52,12 @@ Please send /help command if you have any problem''' % token)
 Your _old_ token has been revoked.
 You can now use the following token to access the HTTP API:
 
-*%s*
+*%(token)s*
 
-Please send /help command if you have any problem''' % token2)
+Your API URL: https://tgbots-fopina.rhcloud.com/pushit/%(token)s
+Your WebPush URL: http://fopina.github.io/tgbot-pushitbot/webpush/#%(token)s
+
+Please send /help command if you have any problem''' % {'token': token2})
 
     def test_notify_invalid_token(self):
         res = self.webapp.post_json('/pushit/123', params={'msg': 'hello'})

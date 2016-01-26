@@ -24,9 +24,12 @@ class PushItPlugin(TGPluginBase):
         return self.bot.return_message(message.chat.id, '''\
 You can use the following token to access the HTTP API:
 
-*%s*
+*%(token)s*
 
-Please send /help command if you have any problem''' % token, parse_mode='Markdown')
+Your API URL: https://tgbots-fopina.rhcloud.com/pushit/%(token)s
+Your WebPush URL: http://fopina.github.io/tgbot-pushitbot/webpush/#%(token)s
+
+Please send /help command if you have any problem''' % {'token': token}, parse_mode='Markdown')
 
     def revoke(self, message, text):
         token = self._new_token(message.chat.id)
@@ -35,9 +38,12 @@ Please send /help command if you have any problem''' % token, parse_mode='Markdo
 Your _old_ token has been revoked.
 You can now use the following token to access the HTTP API:
 
-*%s*
+*%(token)s*
 
-Please send /help command if you have any problem''' % token, parse_mode='Markdown')
+Your API URL: https://tgbots-fopina.rhcloud.com/pushit/%(token)s
+Your WebPush URL: http://fopina.github.io/tgbot-pushitbot/webpush/#%(token)s
+
+Please send /help command if you have any problem''' % {'token': token}, parse_mode='Markdown')
 
     def help(self, message, text):
         return self.bot.return_message(message.chat.id, u'''\
