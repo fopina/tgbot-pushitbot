@@ -30,20 +30,20 @@
         <div class="form-group">
           <label for="inputToken">Text to push</label>
           <div class="input-group">
-            <textarea class="form-control" id="inputText" rows="3"></textarea>
+            <textarea class="form-control" name="msg" id="inputText" rows="3"></textarea>
           </div>
         </div>
         <div class="form-group">
           <label for="formatRadio">Formatting</label>
           <span class="input-group" id="formatRadio">
             <label class="radio-inline">
-              <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="" checked="checked"> None
+              <input type="radio" name="format" id="inlineRadio1" value="" checked="checked"> None
             </label>
             <label class="radio-inline">
-              <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="Markdown"> Markdown
+              <input type="radio" name="format" id="inlineRadio2" value="Markdown"> Markdown
             </label>
             <label class="radio-inline">
-              <input type="radio" name="inlineRadioOptions" id="inlineRadio3" value="HTML"> HTML
+              <input type="radio" name="format" id="inlineRadio3" value="HTML"> HTML
             </label>
           </span>
         </div>
@@ -56,39 +56,15 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script>
-    $( "#pushForm" ).submit(function() {
-      var createCORSRequest = function(method, url) {
-        var xhr = new XMLHttpRequest();
-        if ("withCredentials" in xhr) {
-          // Most browsers.
-          xhr.open(method, url, true);
-        } else if (typeof XDomainRequest != "undefined") {
-          // IE8 & IE9
-          xhr = new XDomainRequest();
-          xhr.open(method, url);
-        } else {
-          // CORS not supported.
-          xhr = null;
-        }
-        return xhr;
-      };
-
+    $("#pushForm").submit(function(e) {
+      e.preventDefault();
       var url = 'https://3cda0916.ngrok.io/pushit/f7a41cbb9940ad64d0b183913cb8e17a';
-      var method = 'POST';
-      var xhr = createCORSRequest(method, url);
-
-      xhr.onreadystatechange = function() {
-        console.log(xhr.readyState);
-        if (xhr.readyState == 4) {
-          console.log(xhr.response);
-        }
-      };
-
-      xhr.onerror = function() {
-        alert('ERROR');
-      };
-
-      xhr.send();
+      $.ajax(url, {
+          type:"POST",
+          data: $(this).serialize(),
+          success:function(data, textStatus, jqXHR) {alert("success");},
+          error: function(jqXHR, textStatus, errorThrown) {alert("failure");}
+      });
     });
     </script>
   </body>
