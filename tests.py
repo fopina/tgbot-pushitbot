@@ -93,20 +93,35 @@ Please send /help command if you have any problem''' % token2)
         res = self.webapp.post_json('/pushit/%s' % token, params={'msg': 'world'})
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.json['ok'], True)
-        # assert message was sent
-        self.assertReplied('world')
+        # assert message was sent and no format
+        r = self.pop_reply()[1]
+        self.assertEqual(r['text'], 'world')
+        self.assertNotIn('parse_mode', r)
 
     def test_notify_get(self):
         token = self.test_token()
-        res = self.webapp.get('/pushit/%s' % token, params={'msg': '1 2 3'})
+        res = self.webapp.get('/pushit/%s' % token, params={'msg': '1 2 3', 'format': 'Markdown'})
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.json['ok'], True)
-        # assert message was sent
-        self.assertReplied('1 2 3')
+        # assert message was sent with markdown format
+        # assert message was sent and no format
+        r = self.pop_reply()[1]
+        self.assertEqual(r['text'], '1 2 3')
+        self.assertEqual(r['parse_mode'], 'Markdown')
 
     def test_notify_broken(self):
         token = self.test_token()
         res = self.webapp.post('/pushit/%s' % token, params={'wrong': 'field'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json['ok'], False)
+        self.assertEqual(res.json['description'], 'Please check API documentation')
+        # assert no messages were sent
+        self.assertNoReplies()
+
+        res = self.webapp.post(
+            '/pushit/%s' % token,
+            params={'msg': 'corrent', 'format': 'wrong'}
+        )
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.json['ok'], False)
         self.assertEqual(res.json['description'], 'Please check API documentation')
