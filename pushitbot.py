@@ -138,7 +138,7 @@ def openshift_app():
 def extend_webapp(app, bot):
     from bottle import request
 
-    @app.route('/pushit/<token>', method='POST')
+    @app.route('/pushit/<token>', method=['GET', 'POST'])
     def pushit(token):
         return bot.notify(token, request.json or request.query or request.forms)
 

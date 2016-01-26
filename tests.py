@@ -5,7 +5,6 @@ from tgbot import plugintest
 from tgbot.webserver import wsgi_app
 import pushitbot
 from webtest import TestApp
-from webtest.app import AppError
 
 
 class BotTest(plugintest.PluginTestCase):
@@ -71,6 +70,16 @@ Please send /help command if you have any problem''' % token2)
         self.assertEqual(res.json['code'], 403)
         self.assertEqual(res.json['description'], 'User blocked PushItBot')
 
+    def test_notify_other_tg_error(self):
+        token = self.test_token()
+
+        self.push_fake_result('...', status_code=400)
+        res = self.webapp.post_json('/pushit/%s' % token, params={'msg': 'hello'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json['ok'], False)
+        self.assertEqual(res.json['code'], 400)
+        self.assertEqual(res.json['description'], '...')
+
     def test_notify_urlencoded(self):
         token = self.test_token()
         res = self.webapp.post('/pushit/%s' % token, params={'msg': 'hello'})
@@ -81,11 +90,19 @@ Please send /help command if you have any problem''' % token2)
 
     def test_notify_json(self):
         token = self.test_token()
-        res = self.webapp.post_json('/pushit/%s' % token, params={'msg': 'hello'})
+        res = self.webapp.post_json('/pushit/%s' % token, params={'msg': 'world'})
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.json['ok'], True)
         # assert message was sent
-        self.assertReplied('hello')
+        self.assertReplied('world')
+
+    def test_notify_get(self):
+        token = self.test_token()
+        res = self.webapp.get('/pushit/%s' % token, params={'msg': '1 2 3'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json['ok'], True)
+        # assert message was sent
+        self.assertReplied('1 2 3')
 
     def test_notify_broken(self):
         token = self.test_token()
