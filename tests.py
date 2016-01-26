@@ -113,6 +113,67 @@ Please send /help command if you have any problem''' % token2)
         # assert no messages were sent
         self.assertNoReplies()
 
+    def test_help(self):
+        self.receive_message('/help')
+        self.assertReplied(u'''\
+I'm PushIt Bot and I can help you integrate your scripts or website with Telegram.
+Please read this manual before we begin:
+
+ 📖 http://fopina.github.com/tgbot-pushitbot/api-docs
+
+Here is the commands list:
+
+/token - view your API token
+/revoke - revoke your API token and create a new one
+''')
+
+
+class OtherTest(plugintest.PluginTestCase):
+    def test_openshift(self):
+        import os
+        import mock
+
+        orig_setup = pushitbot.setup
+
+        def new_setup(*args, **kwargs):
+            self.bot = self.prepare_bot(orig_setup(*args, **kwargs))
+            return self.bot
+
+        os.environ['OPENSHIFT_POSTGRESQL_DB_HOST'] = 'localhost'
+        os.environ['OPENSHIFT_POSTGRESQL_DB_PORT'] = '123'
+        os.environ['PGDATABASE'] = 'test'
+        os.environ['TGTOKEN'] = 'fakeToken'
+        os.environ['OPENSHIFT_APP_DNS'] = 'something.rhcloud.com'
+
+        with mock.patch('pushitbot.setup', new_setup):
+            pushitbot.openshift_app()
+
+        r = self.pop_reply()
+        self.assertEqual(r[0], 'setWebhook')
+        self.assertEqual(r[1]['url'], 'https://something.rhcloud.com/update/fakeToken')
+
+    def test_main(self):
+        import mock
+
+        orig_setup = pushitbot.setup
+
+        def new_setup(*args, **kwargs):
+            self.bot = self.prepare_bot(orig_setup(*args, **kwargs))
+            return self.bot
+
+        with mock.patch('pushitbot.setup', new_setup):
+            # use invalid port to break loop
+            with self.assertRaisesRegexp(OverflowError, 'getsockaddrarg: port must be 0-65535.'):
+                pushitbot.main([
+                    '-t', 'fakeToken',
+                    '-w', 'http://localhost:1234', '80000',
+                ])
+
+        r = self.pop_reply()
+        self.assertEqual(r[0], 'setWebhook')
+        self.assertEqual(r[1]['url'], 'http://localhost:1234/update/fakeToken')
+
+
 if __name__ == '__main__':
     import unittest
     unittest.main()

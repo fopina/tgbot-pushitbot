@@ -145,9 +145,8 @@ def extend_webapp(app, bot):
     return app
 
 
-def main():
-    parser = build_parser()
-    args = parser.parse_args()
+def main(args=None):
+    args = parse_args(args)
 
     tg = setup(db_url=args.db_url, token=args.token)
 
@@ -164,7 +163,7 @@ def main():
     extend_webapp(wsgi_app([tg]), tg).run(host='0.0.0.0', port=int(args.webhook[1]))
 
 
-def build_parser():
+def parse_args(args):
     parser = argparse.ArgumentParser(description='Run PushItBot')
 
     parser.add_argument('--db_url', '-d', dest='db_url', default='sqlite:///pushitbot.sqlite3',
@@ -179,7 +178,7 @@ def build_parser():
                         help='setup database')
     parser.add_argument('--token', '-t', dest='token',
                         help='token provided by @BotFather')
-    return parser
+    return parser.parse_args(args)
 
 
 if __name__ == '__main__':
