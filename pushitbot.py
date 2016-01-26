@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-from tgbot import TGBot
+from tgbot import TGBot, botapi
 from tgbot.pluginbase import TGPluginBase, TGCommandBase
+from tgbot.webserver import wsgi_app
 import argparse
 import os
 
@@ -56,18 +57,54 @@ Here is the commands list:
 I'm not really chatty. Give /help a try if you need something.
 ''')
 
+    # entry point for webserver call
+    def notify(self, chat_token):
+        res = {'ok': True}
+        chat_id = self.read_data('token', chat_token)
+
+        if not chat_id:
+            res['ok'] = False
+            res['code'] = -1
+            res['description'] = 'Invalid token'
+            return res
+
+        ret = self.bot.send_message(chat_id, 'hello').wait()
+        if isinstance(ret, botapi.Error):
+            res['ok'] = False
+            res['code'] = ret.error_code
+            res['description'] = ret.description
+
+        return res
+
     def _new_token(self, chat_id):
+        # revoke old
+        token = self.read_data(chat_id, 'token')
+        if token:
+            self.save_data('token', token)
+
+        # generate new one
         token = os.urandom(16).encode('hex')
         self.save_data(chat_id, 'token', token)
+        self.save_data('token', token, chat_id)
         return token
 
 
+class PushItBot(TGBot):
+    def __init__(self, token, db_url=None):
+        self.pushit = PushItPlugin()
+        TGBot.__init__(
+            self,
+            token, db_url=db_url,
+            plugins=[self.pushit],
+            no_command=self.pushit
+        )
+
+    def notify(self, chat_token):
+        return self.pushit.notify(chat_token)
+
+
 def setup(db_url=None, token=None):
-    p = PushItPlugin()
-    tg = TGBot(
-        token, plugins=[p],
-        no_command=p, db_url=db_url,
-    )
+    tg = PushItBot(token, db_url=db_url)
     return tg
 
 
@@ -84,8 +121,17 @@ def openshift_app():
     )
     bot.set_webhook('https://%s/update/%s' % (os.environ['OPENSHIFT_APP_DNS'], bot.token))
 
-    from tgbot.webserver import wsgi_app
-    return wsgi_app([bot])
+    return extend_webapp(wsgi_app([bot]), bot)
+
+
+def extend_webapp(app, bot):
+    from bottle import request
+
+    @app.route('/pushit/<token>', method='POST')
+    def pushit(token):
+        return bot.notify(token)
+
+    return app
 
 
 def main():
@@ -103,7 +149,8 @@ def main():
         print 'DB created'
         return
 
-    tg.run_web(args.webhook[0], host='0.0.0.0', port=int(args.webhook[1]))
+    tg.set_webhook('%s/update/%s' % (args.webhook[0], tg.token))
+    extend_webapp(wsgi_app([tg]), tg).run(host='0.0.0.0', port=int(args.webhook[1]))
 
 
 def build_parser():
