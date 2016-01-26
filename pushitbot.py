@@ -71,7 +71,10 @@ I'm not really chatty. Give /help a try if you need something.''')
         if isinstance(ret, botapi.Error):
             res['ok'] = False
             res['code'] = ret.error_code
-            res['description'] = ret.description
+            if ret.error_code == 403:
+                res['description'] = 'User blocked PushItBot'
+            else:
+                res['description'] = ret.description
 
         return res
 

@@ -54,6 +54,32 @@ You can now use the following token to access the HTTP API:
 
 Please send /help command if you have any problem''' % token2)
 
+    def test_notify_invalid_token(self):
+        res = self.webapp.post_json('/pushit/123', params={'msg': 'hello'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json['ok'], False)
+        self.assertEqual(res.json['code'], -1)
+        self.assertEqual(res.json['description'], 'Invalid token')
+
+    def test_notify_blocked(self):
+        token = self.test_token()
+
+        self.push_fake_result('...', status_code=403)
+        res = self.webapp.post_json('/pushit/%s' % token, params={'msg': 'hello'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json['ok'], False)
+        self.assertEqual(res.json['code'], 403)
+        self.assertEqual(res.json['description'], 'User blocked PushItBot')
+
+    def test_notify(self):
+        token = self.test_token()
+        res = self.webapp.post_json('/pushit/%s' % token, params={'msg': 'hello'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json['ok'], True)
+
+        # assert message was sent
+        self.assertReplied('hello')
+
 if __name__ == '__main__':
     import unittest
     unittest.main()
