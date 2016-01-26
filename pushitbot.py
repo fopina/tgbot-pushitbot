@@ -53,9 +53,8 @@ Here is the commands list:
 ''', parse_mode='Markdown')
 
     def chat(self, message, text):
-        return self.bot.return_message(message.chat.id, u'''
-I'm not really chatty. Give /help a try if you need something.
-''')
+        return self.bot.return_message(message.chat.id, u'''\
+I'm not really chatty. Give /help a try if you need something.''')
 
     # entry point for webserver call
     def notify(self, chat_token):
