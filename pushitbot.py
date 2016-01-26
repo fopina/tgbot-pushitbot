@@ -57,17 +57,26 @@ Here is the commands list:
 I'm not really chatty. Give /help a try if you need something.''')
 
     # entry point for webserver call
-    def notify(self, chat_token):
-        res = {'ok': True}
+    def notify(self, chat_token, data):
         chat_id = self.read_data('token', chat_token)
 
         if not chat_id:
-            res['ok'] = False
-            res['code'] = -1
-            res['description'] = 'Invalid token'
-            return res
+            return dict(
+                ok=False,
+                code=-1,
+                description='Invalid token'
+            )
 
-        ret = self.bot.send_message(chat_id, 'hello').wait()
+        if 'msg' not in data:
+            return dict(
+                ok=False,
+                code=-999,
+                description='Please check API documentation'
+            )
+
+        ret = self.bot.send_message(chat_id, data['msg']).wait()
+
+        res = {'ok': True}
         if isinstance(ret, botapi.Error):
             res['ok'] = False
             res['code'] = ret.error_code
@@ -101,8 +110,8 @@ class PushItBot(TGBot):
             no_command=self.pushit
         )
 
-    def notify(self, chat_token):
-        return self.pushit.notify(chat_token)
+    def notify(self, chat_token, data):
+        return self.pushit.notify(chat_token, data)
 
 
 def setup(db_url=None, token=None):
@@ -131,7 +140,7 @@ def extend_webapp(app, bot):
 
     @app.route('/pushit/<token>', method='POST')
     def pushit(token):
-        return bot.notify(token)
+        return bot.notify(token, request.json or request.query or request.forms)
 
     return app
 

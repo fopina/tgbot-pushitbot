@@ -71,14 +71,30 @@ Please send /help command if you have any problem''' % token2)
         self.assertEqual(res.json['code'], 403)
         self.assertEqual(res.json['description'], 'User blocked PushItBot')
 
-    def test_notify(self):
+    def test_notify_urlencoded(self):
+        token = self.test_token()
+        res = self.webapp.post('/pushit/%s' % token, params={'msg': 'hello'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json['ok'], True)
+        # assert message was sent
+        self.assertReplied('hello')
+
+    def test_notify_json(self):
         token = self.test_token()
         res = self.webapp.post_json('/pushit/%s' % token, params={'msg': 'hello'})
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.json['ok'], True)
-
         # assert message was sent
         self.assertReplied('hello')
+
+    def test_notify_broken(self):
+        token = self.test_token()
+        res = self.webapp.post('/pushit/%s' % token, params={'wrong': 'field'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json['ok'], False)
+        self.assertEqual(res.json['description'], 'Please check API documentation')
+        # assert no messages were sent
+        self.assertNoReplies()
 
 if __name__ == '__main__':
     import unittest
