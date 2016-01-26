@@ -144,10 +144,14 @@ def openshift_app():
 
 
 def extend_webapp(app, bot):
-    from bottle import request
+    from bottle import request, response
 
     @app.route('/pushit/<token>', method=['GET', 'POST'])
     def pushit(token):
+        # support CORS!
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST'
+        response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With'
         return bot.notify(token, request.json or request.query or request.forms)
 
     return app
