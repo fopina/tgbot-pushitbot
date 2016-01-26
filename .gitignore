@@ -4,3 +4,4 @@ env/
 /localrun
 .coverage
 /.idea
+.cache
