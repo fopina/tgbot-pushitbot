@@ -161,14 +161,16 @@ class OtherTest(plugintest.PluginTestCase):
             self.bot = self.prepare_bot(orig_setup(*args, **kwargs))
             return self.bot
 
+        bottle_run = mock.Mock()
+
         with mock.patch('pushitbot.setup', new_setup):
-            # use invalid port to break loop
-            with self.assertRaisesRegexp(OverflowError, 'getsockaddrarg: port must be 0-65535.'):
+            with mock.patch('bottle.Bottle.run', bottle_run):
                 pushitbot.main([
                     '-t', 'fakeToken',
-                    '-w', 'http://localhost:1234', '80000',
+                    '-w', 'http://localhost:1234', '8000',
                 ])
 
+        bottle_run.assert_called_with(host='0.0.0.0', port=8000)
         r = self.pop_reply()
         self.assertEqual(r[0], 'setWebhook')
         self.assertEqual(r[1]['url'], 'http://localhost:1234/update/fakeToken')
