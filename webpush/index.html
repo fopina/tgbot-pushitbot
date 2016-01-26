@@ -83,6 +83,9 @@
     });
     (function() {
       $("#inputToken").val(localStorage.getItem('pushit-token'));
+      if (window.location.hash.match(/^#[a-f0-9]{32}$/)) {
+        $("#inputToken").val(window.location.hash.substring(1));
+      }
       $("#" + localStorage.getItem('pushit-format')).prop('checked', true);
     })();
     </script>
