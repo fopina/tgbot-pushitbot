@@ -37,13 +37,13 @@
           <label for="formatRadio">Formatting</label>
           <span class="input-group" id="formatRadio">
             <label class="radio-inline">
-              <input type="radio" name="format" id="inlineRadio1" value="" checked="checked"> None
+              <input type="radio" name="format" id="formatRadioNone" value="" checked="checked"> None
             </label>
             <label class="radio-inline">
-              <input type="radio" name="format" id="inlineRadio2" value="Markdown"> Markdown
+              <input type="radio" name="format" id="formatRadioMarkdown" value="Markdown"> Markdown
             </label>
             <label class="radio-inline">
-              <input type="radio" name="format" id="inlineRadio3" value="HTML"> HTML
+              <input type="radio" name="format" id="formatRadioHTML" value="HTML"> HTML
             </label>
           </span>
         </div>
@@ -58,14 +58,33 @@
     <script>
     $("#pushForm").submit(function(e) {
       e.preventDefault();
-      var url = 'https://3cda0916.ngrok.io/pushit/f7a41cbb9940ad64d0b183913cb8e17a';
-      $.ajax(url, {
-          type:"POST",
-          data: $(this).serialize(),
-          success:function(data, textStatus, jqXHR) {alert("success");},
-          error: function(jqXHR, textStatus, errorThrown) {alert("failure");}
-      });
+      var token = $("#inputToken").val();
+      if (token.match(/^[a-f0-9]{32}$/) == null) {
+        alert('That token does not look valid!');
+      }
+      else {
+        localStorage.setItem('pushit-token', token);
+        localStorage.setItem('pushit-format', $('input:radio[name="format"]:checked').prop('id'));
+        var url = 'https://tgbots-fopina.rhcloud.com/pushit/' + $("#inputToken").val();
+        $.ajax(url, {
+            type:"POST",
+            data: $(this).serialize(),
+            success:function(data, textStatus, jqXHR) {
+              if (data.ok) {
+                alert("Message sent!");
+              }
+              else {
+                alert("Failed (" + data.code + "): " + data.description);
+              }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {alert("API Failure");}
+        });
+      }
     });
+    (function() {
+      $("#inputToken").val(localStorage.getItem('pushit-token'));
+      $("#" + localStorage.getItem('pushit-format')).prop('checked', true);
+    })();
     </script>
   </body>
 </html>
