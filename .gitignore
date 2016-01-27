@@ -5,3 +5,4 @@ env/
 .coverage
 /.idea
 .cache
+/_site
