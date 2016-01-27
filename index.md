@@ -36,11 +36,109 @@ format    | string | *Optional* Formatting options as supported by [Telegram Bot
 
 * The URL is case-**sensitive**.
 * GET and POST HTTP methods are supported
-* CORS headers are included so you can use the API in AJAX calls
+* [CORS](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing) headers are included so you can use the API in AJAX calls
 * For passing parameters use on of the below ways:
   * [URL query string](https://en.wikipedia.org/wiki/Query_string) (for GET)
   * [application/x-www-form-urlencoded](https://en.wikipedia.org/wiki/Percent-encoding#The_application.2Fx-www-form-urlencoded_type) (for POST)
   * application/json (for POST)
+
+API Usage Examples
+==================
+
+---
+
+### Any browser
+
+Just load the URL (using GET)
+
+    https://tgbots-fopina.rhcloud.com/pushit/105e48ff92b92263f3397ed55f275a81?msg=testing+1+2+3
+
+
+### cURL
+
+```bash
+curl -d 'msg=*testing* _1_ `2` 3' \
+     -d "format=Markdown" \
+     https://tgbots-fopina.rhcloud.com/pushit/105e48ff92b92263f3397ed55f275a81
+```
+
+### Python
+
+With urllib2
+
+```python
+import urllib
+import urllib2
+import json
+
+r = urllib2.urlopen(
+  'https://tgbots-fopina.rhcloud.com/pushit/105e48ff92b92263f3397ed55f275a81',
+  data=urllib.urlencode({
+    'msg': '<b>testing</b> <i>1</i> <code>2</code> 3',
+    'format': 'HTML'
+  })
+)
+print json.loads(r.read())
+```
+
+With requests
+
+```python
+import requests
+
+r = requests.post(
+  'https://tgbots-fopina.rhcloud.com/pushit/105e48ff92b92263f3397ed55f275a81',
+  data={
+    'msg': '<b>testing</b> <i>1</i> <code>2</code> 3',
+    'format': 'HTML'
+  }
+)
+print r.json()
+```
+
+### PHP
+
+With cURL
+
+```php
+<?php
+$params = array(
+	'msg' => "testing 1 2 3"
+);
+
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, "https://tgbots-fopina.rhcloud.com/pushit/105e48ff92b92263f3397ed55f275a81");
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+$result = curl_exec($ch);
+curl_close($ch);
+
+print_r($result);
+?>
+```
+
+With `file_get_contents()`
+
+```php
+<?php
+$params = array(
+	'msg' => "testing 1 2 3"
+);
+$post = http_build_query($params);
+
+$context = stream_context_create(array(
+                'http' => array(
+                    'method' => 'POST',
+                    'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                    'content' => $post,
+                    'timeout' => 10,
+                ),
+            ));
+
+$response = file_get_contents("https://tgbots-fopina.rhcloud.com/pushit/105e48ff92b92263f3397ed55f275a81", false, $context);
+print $response
+?>
+```
 
 Source - Host your own
 ======================
