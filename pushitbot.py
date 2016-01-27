@@ -13,6 +13,7 @@ class PushItPlugin(TGPluginBase):
         return (
             TGCommandBase('token', self.token, 'view your API token'),
             TGCommandBase('revoke', self.revoke, 'revoke your API token and create a new one'),
+            TGCommandBase('stats', self.stats, 'view your statistics'),
             TGCommandBase('help', self.help, 'more information'),
             TGCommandBase('start', self.start, '', printable=False),
         )
@@ -71,6 +72,17 @@ Here is the commands list:
         return self.bot.return_message(message.chat.id, u'''\
 I'm not really chatty. Give /help a try if you need something.''')
 
+    def stats(self, message, text):
+        s = self.read_data(message.chat.id, 'stats')
+        if s is None:
+            s = 0
+
+        return self.bot.return_message(
+            message.chat.id,
+            '`Pushed messages so far:` *%d*' % s,
+            parse_mode='Markdown'
+        )
+
     # entry point for webserver call
     def notify(self, chat_token, data):
         chat_id = self.read_data('token', chat_token)
@@ -107,6 +119,12 @@ I'm not really chatty. Give /help a try if you need something.''')
                 res['description'] = 'User blocked PushItBot'
             else:
                 res['description'] = ret.description
+        else:
+            # increase stats - TODO: make this atomic
+            s = self.read_data(chat_id, 'stats')
+            if not s:
+                s = 0
+            self.save_data(chat_id, 'stats', s + 1)
 
         return res
 

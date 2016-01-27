@@ -9,6 +9,7 @@ PushIt Bot
 ```
 token - view your API token
 revoke - revoke your API token and create a new one
+stats - view your statistics
 help - more information
 ```
 

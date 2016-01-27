@@ -134,6 +134,45 @@ Please send /help command if you have any problem''' % {'token': token2})
         # assert no messages were sent
         self.assertNoReplies()
 
+    def test_stats(self):
+        token = self.test_token()
+
+        self.receive_message('/stats')
+        self.assertReplied('`Pushed messages so far:` *0*')
+
+        res = self.webapp.post_json('/pushit/%s' % token, params={'msg': 'world'})
+        self.assertEqual(res.json['ok'], True)
+
+        self.receive_message('/stats')
+        self.assertReplied('`Pushed messages so far:` *1*')
+
+    def test_start_token(self):
+        self.receive_message('/start token')
+
+        token = self.bot.pushit.read_data(1, 'token')
+        self.assertIsNotNone(token)
+
+        self.assertReplied('''\
+You can use the following token to access the HTTP API:
+
+*%(token)s*
+
+Your API URL: https://tgbots-fopina.rhcloud.com/pushit/%(token)s
+Your WebPush URL: http://fopina.github.io/tgbot-pushitbot/webpush/#%(token)s
+
+Please send /help command if you have any problem''' % {'token': token})
+        self.assertReplied(u'''\
+I'm PushIt Bot and I can help you integrate your scripts or website with Telegram.
+Please read this manual before we begin:
+
+ 📖 http://fopina.github.io/tgbot-pushitbot/#api-docs
+
+Here is the commands list:
+
+/token - view your API token
+/revoke - revoke your API token and create a new one
+''')
+
     def test_help(self):
         self.receive_message('/help')
         self.assertReplied(u'''\
