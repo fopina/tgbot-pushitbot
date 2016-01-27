@@ -59,7 +59,7 @@ Please send /help command if you have any problem''' % {'token': token}, parse_m
 I'm PushIt Bot and I can help you integrate your scripts or website with Telegram.
 Please read this manual before we begin:
 
- 📖 http://fopina.github.com/tgbot-pushitbot/api-docs
+ 📖 http://fopina.github.io/tgbot-pushitbot/#api-docs
 
 Here is the commands list:
 
