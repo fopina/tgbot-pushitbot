@@ -47,6 +47,8 @@ API Usage Examples
 
 ---
 
+Remember to replace the sample token `105e48ff92b92263f3397ed55f275a81` with your own!
+
 ### Any browser
 
 Just load the URL (using GET)
@@ -60,6 +62,27 @@ Just load the URL (using GET)
 curl -d 'msg=*testing* _1_ `2` 3' \
      -d "format=Markdown" \
      https://tgbots-fopina.rhcloud.com/pushit/105e48ff92b92263f3397ed55f275a81
+```
+
+### JavaScript
+
+With jQuery
+
+```javascript
+$.ajax("https://tgbots-fopina.rhcloud.com/pushit/105e48ff92b92263f3397ed55f275a81", {
+    type:"POST",
+    data: {"msg": "*testing* _1_ `2` 3", "format": "Markdown"},
+    dataType: 'json',
+    success:function(data, textStatus, jqXHR) {
+      if (data.ok) {
+        alert("Message sent!");
+      }
+      else {
+        alert("Failed (" + data.code + "): " + data.description);
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {alert("API Failure");}
+});
 ```
 
 ### Python
