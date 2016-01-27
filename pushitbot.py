@@ -14,6 +14,7 @@ class PushItPlugin(TGPluginBase):
             TGCommandBase('token', self.token, 'view your API token'),
             TGCommandBase('revoke', self.revoke, 'revoke your API token and create a new one'),
             TGCommandBase('help', self.help, 'more information'),
+            TGCommandBase('start', self.help, '', printable=False),
         )
 
     def token(self, message, text):
