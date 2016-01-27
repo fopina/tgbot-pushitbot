@@ -14,7 +14,7 @@ This repository is ready for openshift (as the bot is running there), so you can
 * Talk to [@BotFather](http://telegram.me/botfather) to register your bot  
 * And finally run these commands (replacing `<YOUR_BOT_TOKEN>` with the token provided by @BotFather)
 
-    ```
+    ```bash
     rhc app-create pushitbot python-2.7 postgresql-9.2 --from-code https://github.com/fopina/tgbot-pushitbot/
     cd pushitbot
     rhc env-set TGTOKEN=<YOUR_BOT_TOKEN>
