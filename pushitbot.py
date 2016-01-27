@@ -23,6 +23,9 @@ class PushItPlugin(TGPluginBase):
         if not token:
             token = self._new_token(message.chat.id)
 
+        if not token:
+            return self.bot.return_message(message.chat.id, 'Failed to generate a token... Please try again.')
+
         return self.bot.return_message(message.chat.id, '''\
 You can use the following token to access the HTTP API:
 
@@ -35,6 +38,9 @@ Please send /help command if you have any problem''' % {'token': token}, parse_m
 
     def revoke(self, message, text):
         token = self._new_token(message.chat.id)
+
+        if not token:
+            return self.bot.return_message(message.chat.id, 'Failed to generate a token... Please try again.')
 
         return self.bot.return_message(message.chat.id, '''\
 Your _old_ token has been revoked.
@@ -129,16 +135,26 @@ I'm not really chatty. Give /help a try if you need something.''')
         return res
 
     def _new_token(self, chat_id):
+        # generate a new token (making sure it's not used)
+        new_token = None
+        for _ in xrange(3):
+            _token = os.urandom(16).encode('hex')
+            if self.read_data('token', _token) is None:
+                new_token = _token
+                break
+
+        if not new_token:
+            return None
+
         # revoke old
         token = self.read_data(chat_id, 'token')
         if token:
             self.save_data('token', token)
 
-        # generate new one
-        token = os.urandom(16).encode('hex')
-        self.save_data(chat_id, 'token', token)
-        self.save_data('token', token, chat_id)
-        return token
+        # save new one
+        self.save_data(chat_id, 'token', new_token)
+        self.save_data('token', new_token, chat_id)
+        return new_token
 
 
 class PushItBot(TGBot):
