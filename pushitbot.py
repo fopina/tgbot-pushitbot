@@ -14,7 +14,7 @@ class PushItPlugin(TGPluginBase):
             TGCommandBase('token', self.token, 'view your API token'),
             TGCommandBase('revoke', self.revoke, 'revoke your API token and create a new one'),
             TGCommandBase('help', self.help, 'more information'),
-            TGCommandBase('start', self.help, '', printable=False),
+            TGCommandBase('start', self.start, '', printable=False),
         )
 
     def token(self, message, text):
@@ -45,6 +45,14 @@ Your API URL: https://tgbots-fopina.rhcloud.com/pushit/%(token)s
 Your WebPush URL: http://fopina.github.io/tgbot-pushitbot/webpush/#%(token)s
 
 Please send /help command if you have any problem''' % {'token': token}, parse_mode='Markdown')
+
+    def start(self, message, text):
+        m = self.help(message, text)
+        if text == 'token':
+            m.run().wait()
+            return self.token(message, text)
+        else:
+            return m
 
     def help(self, message, text):
         return self.bot.return_message(message.chat.id, u'''\
