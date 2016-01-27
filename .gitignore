@@ -1,0 +1,7 @@
+*.pyc
+/env
+/_site
+/.cache
+.coverage
+/localrun
+*.sqlite3
