@@ -1,5 +1,7 @@
 ---
 layout: index
+title: PushItBot
+tagline: A bot to help you integrate your website and scripts with Telegram
 ---
 
 PushItBot allows you to easily get notifications from your website or scripts on your Telegram window.

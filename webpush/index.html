@@ -1,101 +1,38 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>PushItBot by fopina</title>
-    <link rel="stylesheet" href="../stylesheets/styles.css">
-    <link rel="stylesheet" href="../stylesheets/github-dark.css">
-    <link rel="stylesheet" href="../stylesheets/zenburn.css">
-    <link rel="stylesheet" href="webpush.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="../javascripts/respond.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <!--[if lt IE 8]>
-    <link rel="stylesheet" href="../stylesheets/ie.css">
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+---
+layout: index
+title: PushItBot
+tagline: Web Push
+styles:
+  webpush.css
+scripts:
+  webpush.js
+---
+
+<p><center><a href="../">Visit project page if you were not referred here by @PushItBot</a></center></p>
 
 
-  </head>
-  <body>
-    <div class="wrapper">
+<form id="pushForm" class="basic-grey">
+    <label>
+        <span>API Token :</span>
+        <input id="inputToken" type="text" name="token" placeholder="Token provided by @PushItBot" />
+    </label>
 
-      <section>
-        <div id="title">
-          <h1>PushItBot</h1>
-          <p>Web Push</p>
-          <hr>
-          <span class="credits left">Project maintained by <a href="https://github.com/fopina">fopina</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
-        </div>
-        <p><center><a href="../">Visit project page if you were not referred here by @PushItBot</a></center></p>
+    <label>
+        <span>Format :</span>
+        <select name="format" id="inputFormat">
+        <option value="">No formatting</option>
+        <option value="Markdown">Markdown</option>
+        <option value="HTML">HTML</option>
+        </select>
+    </label>
 
+    <label>
+        <span>Message :</span>
+        <textarea id="message" name="msg" placeholder="Message to Push"></textarea>
+    </label>
 
-        <form id="pushForm" class="basic-grey">
-            <label>
-                <span>API Token :</span>
-                <input id="inputToken" type="text" name="token" placeholder="Token provided by @PushItBot" />
-            </label>
-
-            <label>
-                <span>Format :</span>
-                <select name="format" id="inputFormat">
-                <option value="">No formatting</option>
-                <option value="Markdown">Markdown</option>
-                <option value="HTML">HTML</option>
-                </select>
-            </label>
-
-            <label>
-                <span>Message :</span>
-                <textarea id="message" name="msg" placeholder="Message to Push"></textarea>
-            </label>
-
-             <label>
-                <span>&nbsp;</span>
-                <button type="submit">Push It</button>
-            </label>
-        </form>
-      </section>
-
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    <script type="text/javascript">
-      $("#pushForm").submit(function(e) {
-        e.preventDefault();
-        var token = $("#inputToken").val();
-        if (token.match(/^[a-f0-9]{32}$/) == null) {
-          alert('That token does not look valid!');
-        }
-        else {
-          localStorage.setItem('pushit-token', token);
-          localStorage.setItem('pushit-format', $("#inputFormat").val());
-          var url = 'https://tgbots-fopina.rhcloud.com/pushit/' + $("#inputToken").val();
-          $.ajax(url, {
-              type:"POST",
-              data: $(this).serialize(),
-              success:function(data, textStatus, jqXHR) {
-                if (data.ok) {
-                  alert("Message sent!");
-                }
-                else {
-                  alert("Failed (" + data.code + "): " + data.description);
-                }
-              },
-              error: function(jqXHR, textStatus, errorThrown) {alert("API Failure");}
-          });
-        }
-      });
-      (function() {
-        $("#inputToken").val(localStorage.getItem('pushit-token'));
-        if (window.location.hash.match(/^#[a-f0-9]{32}$/)) {
-          $("#inputToken").val(window.location.hash.substring(1));
-        }
-        $("#inputFormat").val(localStorage.getItem('pushit-format'));
-      })();
-    </script>
-  </body>
-</html>
+     <label>
+        <span>&nbsp;</span>
+        <button type="submit">Push It</button>
+    </label>
+</form>
