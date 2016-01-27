@@ -1,5 +1,3 @@
-baseurl: /tgbot-pushitbot
-
 markdown: redcarpet
 
 redcarpet:
