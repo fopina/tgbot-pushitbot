@@ -6,6 +6,12 @@ PushItBot allows you to easily get notifications from your website or scripts on
 
 Just talk to [@PushItBot](https://telegram.me/pushitbot) on Telegram to check it out.
 
+### Table of contents
+{:.no_toc}
+
+* Table of contents placeholder
+{:toc}
+
 API Docs
 =========
 
