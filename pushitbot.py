@@ -9,6 +9,10 @@ import os
 
 
 class PushItPlugin(TGPluginBase):
+    def __init__(self, base_url=''):
+        super(PushItPlugin, self).__init__()
+        self.base_url = base_url
+
     def list_commands(self):
         return (
             TGCommandBase('token', self.token, 'view your API token'),
@@ -31,10 +35,10 @@ You can use the following token to access the HTTP API:
 
 *%(token)s*
 
-Your API URL: https://tgbots-fopina.rhcloud.com/pushit/%(token)s
+Your API URL: %(url)s/pushit/%(token)s
 Your WebPush URL: http://fopina.github.io/tgbot-pushitbot/webpush/#%(token)s
 
-Please send /help command if you have any problem''' % {'token': token}, parse_mode='Markdown')
+Please send /help command if you have any problem''' % {'url': self.base_url, 'token': token}, parse_mode='Markdown')
 
     def revoke(self, message, text):
         token = self._new_token(message.chat.id)
@@ -48,10 +52,10 @@ You can now use the following token to access the HTTP API:
 
 *%(token)s*
 
-Your API URL: https://tgbots-fopina.rhcloud.com/pushit/%(token)s
+Your API URL: %(url)s/pushit/%(token)s
 Your WebPush URL: http://fopina.github.io/tgbot-pushitbot/webpush/#%(token)s
 
-Please send /help command if you have any problem''' % {'token': token}, parse_mode='Markdown')
+Please send /help command if you have any problem''' % {'url': self.base_url, 'token': token}, parse_mode='Markdown')
 
     def start(self, message, text):
         m = self.help(message, text)
@@ -148,8 +152,8 @@ I'm not really chatty. Give /help a try if you need something.''')
 
 
 class PushItBot(TGBot):
-    def __init__(self, token, db_url=None):
-        self.pushit = PushItPlugin()
+    def __init__(self, token, db_url=None, base_url=''):
+        self.pushit = PushItPlugin(base_url)
         TGBot.__init__(
             self,
             token, db_url=db_url,
@@ -161,8 +165,8 @@ class PushItBot(TGBot):
         return self.pushit.notify(chat_token, data)
 
 
-def setup(db_url=None, token=None):
-    tg = PushItBot(token, db_url=db_url)
+def setup(db_url, token, base_url):
+    tg = PushItBot(token, db_url=db_url, base_url=base_url)
     return tg
 
 
@@ -170,12 +174,13 @@ def openshift_app():
     import os
 
     bot = setup(
-        db_url='postgresql://%s:%s/%s' % (
+        'postgresql://%s:%s/%s' % (
             os.environ['OPENSHIFT_POSTGRESQL_DB_HOST'],
             os.environ['OPENSHIFT_POSTGRESQL_DB_PORT'],
             os.environ['PGDATABASE']
         ),
-        token=os.environ['TGTOKEN']
+        os.environ['TGTOKEN'],
+        'https://%s' % os.environ['OPENSHIFT_APP_DNS']
     )
     bot.set_webhook('https://%s/update/%s' % (os.environ['OPENSHIFT_APP_DNS'], bot.token))
 
@@ -199,7 +204,7 @@ def extend_webapp(app, bot):
 def main(args=None):
     args = parse_args(args)
 
-    tg = setup(db_url=args.db_url, token=args.token)
+    tg = setup(args.db_url, args.token, args.webhook[0])
 
     if args.list:
         tg.print_commands()

@@ -46,7 +46,7 @@ You can now use the following token to access the HTTP API:
 
 *%(token)s*
 
-Your API URL: https://tgbots-fopina.rhcloud.com/pushit/%(token)s
+Your API URL: /pushit/%(token)s
 Your WebPush URL: http://fopina.github.io/tgbot-pushitbot/webpush/#%(token)s
 
 Please send /help command if you have any problem''' % {'token': token2})
@@ -201,11 +201,17 @@ class OtherTest(plugintest.PluginTestCase):
 
         with mock.patch('pushitbot.setup', new_setup):
             with mock.patch('tgbot.TGBot.print_commands') as m:
-                pushitbot.main(['-l'])
+                pushitbot.main([
+                    '-l',
+                    '-w', '', '',
+                ])
                 self.assertTrue(m.called)
 
             with mock.patch('tgbot.TGBot.setup_db') as m:
-                pushitbot.main(['--create_db'])
+                pushitbot.main([
+                    '--create_db',
+                    '-w', '', '',
+                ])
                 self.assertTrue(m.called)
 
             with mock.patch('bottle.Bottle.run', bottle_run):
@@ -225,7 +231,7 @@ You can use the following token to access the HTTP API:
 
 *%(token)s*
 
-Your API URL: https://tgbots-fopina.rhcloud.com/pushit/%(token)s
+Your API URL: /pushit/%(token)s
 Your WebPush URL: http://fopina.github.io/tgbot-pushitbot/webpush/#%(token)s
 
 Please send /help command if you have any problem'''
