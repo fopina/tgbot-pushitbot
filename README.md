@@ -23,3 +23,4 @@ This repository is ready for openshift (as the bot is running there), so you can
     ```
 
 Have fun!
+
