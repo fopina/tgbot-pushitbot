@@ -100,15 +100,11 @@ I'm not really chatty. Give /help a try if you need something.''')
                 description='Invalid token'
             )
 
-        if 'msg' not in data:
-            return dict(
-                ok=False,
-                code=-999,
-                description='Please check API documentation'
-            )
-
         parse_mode = data.get('format')
-        if parse_mode and parse_mode not in ['Markdown', 'HTML']:
+        if any((
+            not data.get('msg'),
+            parse_mode and parse_mode not in ['Markdown', 'HTML']
+        )):
             return dict(
                 ok=False,
                 code=-999,
