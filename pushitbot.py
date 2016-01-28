@@ -136,14 +136,8 @@ I'm not really chatty. Give /help a try if you need something.''')
 
     def _new_token(self, chat_id):
         # generate a new token (making sure it's not used)
-        new_token = None
-        for _ in xrange(3):
-            _token = os.urandom(16).encode('hex')
-            if self.read_data('token', _token) is None:
-                new_token = _token
-                break
-
-        if not new_token:
+        _token = os.urandom(16).encode('hex')
+        if self.read_data('token', _token) is not None:
             return None
 
         # revoke old
@@ -152,9 +146,9 @@ I'm not really chatty. Give /help a try if you need something.''')
             self.save_data('token', token)
 
         # save new one
-        self.save_data(chat_id, 'token', new_token)
-        self.save_data('token', new_token, chat_id)
-        return new_token
+        self.save_data(chat_id, 'token', _token)
+        self.save_data('token', _token, chat_id)
+        return _token
 
 
 class PushItBot(TGBot):
