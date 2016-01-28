@@ -29,15 +29,7 @@ I'm not really chatty. Give /help a try if you need something.''')
         self.assertIsNotNone(token)
         self.assertIsNotNone(self.bot.pushit.read_data('token', token))
 
-        self.assertReplied('''\
-You can use the following token to access the HTTP API:
-
-*%(token)s*
-
-Your API URL: https://tgbots-fopina.rhcloud.com/pushit/%(token)s
-Your WebPush URL: http://fopina.github.io/tgbot-pushitbot/webpush/#%(token)s
-
-Please send /help command if you have any problem''' % {'token': token})
+        self.assertReplied(_TOKEN_TEXT % {'token': token})
 
         return token
 
@@ -152,40 +144,24 @@ Please send /help command if you have any problem''' % {'token': token2})
         token = self.bot.pushit.read_data(1, 'token')
         self.assertIsNotNone(token)
 
-        self.assertReplied('''\
-You can use the following token to access the HTTP API:
-
-*%(token)s*
-
-Your API URL: https://tgbots-fopina.rhcloud.com/pushit/%(token)s
-Your WebPush URL: http://fopina.github.io/tgbot-pushitbot/webpush/#%(token)s
-
-Please send /help command if you have any problem''' % {'token': token})
-        self.assertReplied(u'''\
-I'm PushIt Bot and I can help you integrate your scripts or website with Telegram.
-Please read this manual before we begin:
-
- 📖 http://fopina.github.io/tgbot-pushitbot/#api-docs
-
-Here is the commands list:
-
-/token - view your API token
-/revoke - revoke your API token and create a new one
-''')
+        self.assertReplied(_TOKEN_TEXT % {'token': token})
+        self.assertReplied(_HELP_TEXT)
 
     def test_help(self):
         self.receive_message('/help')
-        self.assertReplied(u'''\
-I'm PushIt Bot and I can help you integrate your scripts or website with Telegram.
-Please read this manual before we begin:
+        self.assertReplied(_HELP_TEXT)
 
- 📖 http://fopina.github.io/tgbot-pushitbot/#api-docs
+        self.receive_message('/start')
+        self.assertReplied(_HELP_TEXT)
 
-Here is the commands list:
+    def test_no_new_token(self):
+        import mock
 
-/token - view your API token
-/revoke - revoke your API token and create a new one
-''')
+        with mock.patch('os.urandom', return_value='1' * 16):
+            self.test_token()
+            self.receive_message('/revoke')
+            self.assertReplied('Failed to generate a token... Please try again.')
+            self.receive_message('/token', sender={'id': 2, 'first_name': 'Paul'})
 
 
 class OtherTest(plugintest.PluginTestCase):
@@ -235,6 +211,28 @@ class OtherTest(plugintest.PluginTestCase):
         self.assertEqual(r[0], 'setWebhook')
         self.assertEqual(r[1]['url'], 'http://localhost:1234/update/fakeToken')
 
+
+_TOKEN_TEXT = '''\
+You can use the following token to access the HTTP API:
+
+*%(token)s*
+
+Your API URL: https://tgbots-fopina.rhcloud.com/pushit/%(token)s
+Your WebPush URL: http://fopina.github.io/tgbot-pushitbot/webpush/#%(token)s
+
+Please send /help command if you have any problem'''
+
+_HELP_TEXT = u'''\
+I'm PushIt Bot and I can help you integrate your scripts or website with Telegram.
+Please read this manual before we begin:
+
+ 📖 http://fopina.github.io/tgbot-pushitbot/#api-docs
+
+Here is the commands list:
+
+/token - view your API token
+/revoke - revoke your API token and create a new one
+'''
 
 if __name__ == '__main__':
     import unittest
