@@ -200,6 +200,14 @@ class OtherTest(plugintest.PluginTestCase):
         bottle_run = mock.Mock()
 
         with mock.patch('pushitbot.setup', new_setup):
+            with mock.patch('tgbot.TGBot.print_commands') as m:
+                pushitbot.main(['-l'])
+                self.assertTrue(m.called)
+
+            with mock.patch('tgbot.TGBot.setup_db') as m:
+                pushitbot.main(['--create_db'])
+                self.assertTrue(m.called)
+
             with mock.patch('bottle.Bottle.run', bottle_run):
                 pushitbot.main([
                     '-t', 'fakeToken',
