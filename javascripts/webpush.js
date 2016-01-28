@@ -11,7 +11,10 @@ $("#pushForm").submit(function(e) {
   e.preventDefault();
   var token = $("#inputToken").val();
   if (token.match(/^[a-f0-9]{32}$/) == null) {
-    $.dismissableError('', 'Invalid Token');
+    $.dismissableError('', 'Invalid token');
+  }
+  else if ($("#message").val() === "") {
+    $.dismissableError('', 'Message is empty');
   }
   else {
     localStorage.setItem('pushit-token', token);
