@@ -1,25 +1,36 @@
+$.dismissableError = function(title, message)
+{
+  $.blockUI({
+    message: "<h3>ERROR " + title + "</h3><h1>" + message + "</h1><h6>click anywhere to dismiss</h6>",
+    onOverlayClick: $.unblockUI,
+    onBlock: function() {$('.blockUI.blockMsg.blockPage').click($.unblockUI)}
+  });
+}
+
 $("#pushForm").submit(function(e) {
   e.preventDefault();
   var token = $("#inputToken").val();
   if (token.match(/^[a-f0-9]{32}$/) == null) {
-    alert('That token does not look valid!');
+    $.dismissableError('', 'Invalid Token');
   }
   else {
     localStorage.setItem('pushit-token', token);
     localStorage.setItem('pushit-format', $("#inputFormat").val());
-    var url = 'https://tgbots-fopina.rhcloud.com/pushit/' + $("#inputToken").val();
-    $.ajax(url, {
+    $.blockUI({ message: 'Pushing...' });
+    $.ajax('https://tgbots-fopina.rhcloud.com/pushit/' + $("#inputToken").val(), {
         type:"POST",
         data: $(this).serialize(),
         success:function(data, textStatus, jqXHR) {
           if (data.ok) {
-            alert("Message sent!");
+            $.growlUI('Success', 'Message sent!');
           }
           else {
-            alert("Failed (" + data.code + "): " + data.description);
+            $.dismissableError(data.code, data.description);
           }
         },
-        error: function(jqXHR, textStatus, errorThrown) {alert("API Failure");}
+        error: function(jqXHR, textStatus, errorThrown) {
+          $.dismissableError('', 'API Failure');
+        }
     });
   }
 });

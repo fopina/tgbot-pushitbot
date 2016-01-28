@@ -1,4 +1,4 @@
-/* Basic Grey */
+/* Basic Grey Form*/
 .basic-grey {
     margin-left:auto;
     margin-right:auto;
@@ -80,4 +80,22 @@
 }
 .basic-grey .button:hover {
     background: #CF7A7A
+}
+
+/* Block UI CSS */
+.blockMsg h1 {
+  color: red;
+}
+
+.blockMsg h3 {
+  color: black;
+}
+
+.blockMsg h6 {
+  color: black;
+}
+
+div.growlUI { background: url(check48.png) no-repeat 10px 10px }
+div.growlUI h1, div.growlUI h2 {
+    color: white; padding: 5px 5px 5px 75px; text-align: left
 }
