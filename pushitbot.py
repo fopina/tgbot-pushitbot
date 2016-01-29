@@ -6,6 +6,7 @@ from tgbot.pluginbase import TGPluginBase, TGCommandBase
 from tgbot.webserver import wsgi_app
 import argparse
 import os
+import time
 
 
 class PushItPlugin(TGPluginBase):
@@ -126,11 +127,19 @@ I'm not really chatty. Give /help a try if you need something.''')
             else:
                 res['description'] = ret.description
         else:
-            # increase stats - TODO: make this atomic
-            s = self.read_data(chat_id, 'stats')
-            if not s:
-                s = 0
-            self.save_data(chat_id, 'stats', s + 1)
+            # increase stats
+            # try 3 times in case of atomic failure
+            for _ in xrange(3):
+                try:
+                    with self.bot.db.atomic():
+                        s = self.read_data(chat_id, 'stats')
+                        if not s:
+                            s = 0
+                        self.save_data(chat_id, 'stats', s + 1)
+                except:
+                    time.sleep(0.05)
+                else:
+                    break
 
         return res
 
