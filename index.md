@@ -39,7 +39,7 @@ Pushing Messages
 
 In order to push notifications to your **Telegram** account, you need to send HTTP requests to the following address:
 
-    https://tgbots-fopina.rhcloud.com/pushit/<YOUR_TOKEN>
+    https://tgbots.skmobi.com/pushit/<YOUR_TOKEN>
 
 
 Field     | Type   | Description
@@ -66,7 +66,7 @@ Remember to replace the sample token `105e48ff92b92263f3397ed55f275a81` with you
 
 Just load the URL (using GET)
 
-    https://tgbots-fopina.rhcloud.com/pushit/105e48ff92b92263f3397ed55f275a81?msg=testing+1+2+3
+    https://tgbots.skmobi.com/pushit/105e48ff92b92263f3397ed55f275a81?msg=testing+1+2+3
 
 
 ### cURL
@@ -74,7 +74,7 @@ Just load the URL (using GET)
 ```bash
 curl -d 'msg=*testing* _1_ `2` 3' \
      -d "format=Markdown" \
-     https://tgbots-fopina.rhcloud.com/pushit/105e48ff92b92263f3397ed55f275a81
+     https://tgbots.skmobi.com/pushit/105e48ff92b92263f3397ed55f275a81
 ```
 
 ### JavaScript
@@ -82,7 +82,7 @@ curl -d 'msg=*testing* _1_ `2` 3' \
 With jQuery
 
 ```javascript
-$.ajax("https://tgbots-fopina.rhcloud.com/pushit/105e48ff92b92263f3397ed55f275a81", {
+$.ajax("https://tgbots.skmobi.com/pushit/105e48ff92b92263f3397ed55f275a81", {
     type:"POST",
     data: {"msg": "*testing* _1_ `2` 3", "format": "Markdown"},
     dataType: 'json',
@@ -108,7 +108,7 @@ import urllib2
 import json
 
 r = urllib2.urlopen(
-  'https://tgbots-fopina.rhcloud.com/pushit/105e48ff92b92263f3397ed55f275a81',
+  'https://tgbots.skmobi.com/pushit/105e48ff92b92263f3397ed55f275a81',
   data=urllib.urlencode({
     'msg': '<b>testing</b> <i>1</i> <code>2</code> 3',
     'format': 'HTML'
@@ -123,7 +123,7 @@ With requests
 import requests
 
 r = requests.post(
-  'https://tgbots-fopina.rhcloud.com/pushit/105e48ff92b92263f3397ed55f275a81',
+  'https://tgbots.skmobi.com/pushit/105e48ff92b92263f3397ed55f275a81',
   data={
     'msg': '<b>testing</b> <i>1</i> <code>2</code> 3',
     'format': 'HTML'
@@ -143,7 +143,7 @@ $params = array(
 );
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "https://tgbots-fopina.rhcloud.com/pushit/105e48ff92b92263f3397ed55f275a81");
+curl_setopt($ch, CURLOPT_URL, "https://tgbots.skmobi.com/pushit/105e48ff92b92263f3397ed55f275a81");
 curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
 $result = curl_exec($ch);
@@ -171,7 +171,7 @@ $context = stream_context_create(array(
                 ),
             ));
 
-$response = file_get_contents("https://tgbots-fopina.rhcloud.com/pushit/105e48ff92b92263f3397ed55f275a81", false, $context);
+$response = file_get_contents("https://tgbots.skmobi.com/pushit/105e48ff92b92263f3397ed55f275a81", false, $context);
 print $response
 ?>
 ```

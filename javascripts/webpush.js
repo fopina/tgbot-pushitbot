@@ -20,7 +20,7 @@ $("#pushForm").submit(function(e) {
     localStorage.setItem('pushit-token', token);
     localStorage.setItem('pushit-format', $("#inputFormat").val());
     $.blockUI({ message: 'Pushing...' });
-    $.ajax('https://tgbots-fopina.rhcloud.com/pushit/' + $("#inputToken").val(), {
+    $.ajax('https://tgbots.skmobi.com/pushit/' + $("#inputToken").val(), {
         type:"POST",
         data: $(this).serialize(),
         success:function(data, textStatus, jqXHR) {
