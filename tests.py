@@ -126,6 +126,29 @@ Please send /help command if you have any problem''' % {'token': token2})
         # assert no messages were sent
         self.assertNoReplies()
 
+    def test_notify_raw(self):
+        token = self.test_token()
+        res = self.webapp.post_json('/pushit/%s/raw' % token, params={'msg': 'world'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json['ok'], True)
+        r = self.pop_reply()[1]
+        self.assertEqual(r['text'], '```\n{\n    "msg": "world"\n}\n```')
+        self.assertEqual(r['parse_mode'], 'Markdown')
+
+        res = self.webapp.get('/pushit/%s/raw/' % token, params={'anything': 'else'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json['ok'], True)
+        r = self.pop_reply()[1]
+        self.assertEqual(r['text'], '```\n{\n    "anything": "else"\n}\n```')
+        self.assertEqual(r['parse_mode'], 'Markdown')
+
+        res = self.webapp.post('/pushit/%s/raw/' % token, params={'yet': 'another'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json['ok'], True)
+        r = self.pop_reply()[1]
+        self.assertEqual(r['text'], '```\n{\n    "yet": "another"\n}\n```')
+        self.assertEqual(r['parse_mode'], 'Markdown')
+
     def test_stats(self):
         token = self.test_token()
 
@@ -246,6 +269,8 @@ Here is the commands list:
 
 /token - view your API token
 /revoke - revoke your API token and create a new one
+/stats - view your statistics
+/help - this text
 '''
 
 if __name__ == '__main__':

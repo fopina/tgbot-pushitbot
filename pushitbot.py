@@ -7,6 +7,7 @@ from tgbot.webserver import wsgi_app
 import argparse
 import os
 import time
+import json
 
 
 class PushItPlugin(TGPluginBase):
@@ -97,7 +98,7 @@ I'm not really chatty. Give /help a try if you need something.''')
         )
 
     # entry point for webserver call
-    def notify(self, chat_token, data):
+    def notify(self, chat_token, data, raw=False):
         chat_id = self.read_data('token', chat_token)
 
         if not chat_id:
@@ -107,18 +108,24 @@ I'm not really chatty. Give /help a try if you need something.''')
                 description='Invalid token'
             )
 
-        parse_mode = data.get('format')
-        if any((
-            not data.get('msg'),
-            parse_mode and parse_mode not in ['Markdown', 'HTML']
-        )):
-            return dict(
-                ok=False,
-                code=-999,
-                description='Please check API documentation'
-            )
+        if raw:
+            parse_mode = 'Markdown'
+            data = dict(data)
+            msg = '```\n%s\n```' % json.dumps(data, indent=4)
+        else:
+            parse_mode = data.get('format')
+            if any((
+                not data.get('msg'),
+                parse_mode and parse_mode not in ['Markdown', 'HTML']
+            )):
+                return dict(
+                    ok=False,
+                    code=-999,
+                    description='Please check API documentation'
+                )
+            msg = data['msg']
 
-        ret = self.bot.send_message(chat_id, data['msg'], parse_mode=parse_mode).wait()
+        ret = self.bot.send_message(chat_id, msg, parse_mode=parse_mode).wait()
 
         res = {'ok': True}
         if isinstance(ret, botapi.Error):
@@ -172,8 +179,8 @@ class PushItBot(TGBot):
             no_command=self.pushit
         )
 
-    def notify(self, chat_token, data):
-        return self.pushit.notify(chat_token, data)
+    def notify(self, chat_token, data, raw=False):
+        return self.pushit.notify(chat_token, data, raw=raw)
 
 
 def setup(db_url, token, base_url):
@@ -208,6 +215,15 @@ def extend_webapp(app, bot):
         response.headers['Access-Control-Allow-Methods'] = 'GET, POST'
         response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With'
         return bot.notify(token, request.json or request.query or request.forms)
+
+    @app.route('/pushit/<token>/raw', method=['GET', 'POST'])
+    @app.route('/pushit/<token>/raw/', method=['GET', 'POST'])
+    def pushit_raw(token):
+        # support CORS!
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST'
+        response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With'
+        return bot.notify(token, request.json or request.params, raw=True)
 
     return app
 
