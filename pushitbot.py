@@ -77,6 +77,8 @@ Here is the commands list:
 
 /token - view your API token
 /revoke - revoke your API token and create a new one
+/stats - view your statistics
+/help - this text
 ''', parse_mode='Markdown')
 
     def chat(self, message, text):
