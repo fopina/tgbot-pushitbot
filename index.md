@@ -132,6 +132,36 @@ r = requests.post(
 print r.json()
 ```
 
+### Go
+
+```go
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+)
+
+func main() {
+	resp, err := http.PostForm(
+		"https://tgbots.skmobi.com/pushit/355aac1b7f0efe055b3f0f663cae16fc",
+		url.Values{
+			"msg":    {"hello"},
+			"format": {"Markdown"},
+		},
+	)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(body))
+}
+```
+
 ### PHP
 
 With cURL
