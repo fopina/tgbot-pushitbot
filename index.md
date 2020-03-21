@@ -16,6 +16,7 @@ Just talk to [@PushItBot](https://telegram.me/pushitbot) on Telegram to check it
   - [cURL](#curl)
   - [JavaScript](#javascript)
   - [Python](#python)
+  - [Go](#go)
   - [PHP](#php)
 - [Source - Host your own](#source---host-your-own)
 
