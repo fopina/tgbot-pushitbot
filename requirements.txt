@@ -1,3 +1,3 @@
 tgbotplug==1.2.10
-bottle==0.12.19
+bottle==0.12.20
 psycopg2==2.6.1
